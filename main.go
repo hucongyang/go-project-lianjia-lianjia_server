@@ -5,7 +5,9 @@ import (
 	"github.com/hucongyang/go-project-lianjia-lianjia_server/global"
 	"github.com/hucongyang/go-project-lianjia-lianjia_server/internal/model"
 	"github.com/hucongyang/go-project-lianjia-lianjia_server/internal/routers"
+	"github.com/hucongyang/go-project-lianjia-lianjia_server/pkg/logger"
 	setting2 "github.com/hucongyang/go-project-lianjia-lianjia_server/pkg/setting"
+	"gopkg.in/natefinch/lumberjack.v2"
 	"log"
 	"net/http"
 	"time"
@@ -17,11 +19,15 @@ func init() {
 	if err != nil {
 		log.Fatalf("init.setupSetting err: %v", err)
 	}
-
 	// 数据库连接初始化
 	err = setupDBEngine()
 	if err != nil {
 		log.Fatalf("init.setupDBEngine err: %v", err)
+	}
+	// 日志信息初始化
+	err = setupLogger()
+	if err != nil {
+		log.Fatalf("init.setupLogger err: %v", err)
 	}
 }
 
@@ -69,5 +75,18 @@ func setupDBEngine() error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+// 初始化日志
+func setupLogger() error {
+	fileName := global.AppSetting.LogSavePath + "/" + global.AppSetting.LogFileName + global.AppSetting.LogFileExt
+	global.Logger = logger.NewLogger(&lumberjack.Logger{
+		Filename:  fileName,
+		MaxSize:   500,
+		MaxAge:    10,
+		LocalTime: true,
+	}, "", log.LstdFlags).WithCaller(2)
+
 	return nil
 }
