@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/hucongyang/go-project-lianjia-lianjia_server/global"
+	"github.com/hucongyang/go-project-lianjia-lianjia_server/internal/model"
 	"github.com/hucongyang/go-project-lianjia-lianjia_server/internal/routers"
 	setting2 "github.com/hucongyang/go-project-lianjia-lianjia_server/pkg/setting"
 	"log"
@@ -11,9 +12,16 @@ import (
 )
 
 func init() {
+	// 配置信息初始化
 	err := setupSetting()
 	if err != nil {
 		log.Fatalf("init.setupSetting err: %v", err)
+	}
+
+	// 数据库连接初始化
+	err = setupDBEngine()
+	if err != nil {
+		log.Fatalf("init.setupDBEngine err: %v", err)
 	}
 }
 
@@ -30,6 +38,7 @@ func main() {
 	service.ListenAndServe()
 }
 
+// 初始化配置
 func setupSetting() error {
 	setting, err := setting2.NewSetting()
 	if err != nil {
@@ -50,5 +59,15 @@ func setupSetting() error {
 
 	global.ServerSetting.ReadTimeout *= time.Second
 	global.ServerSetting.WriteTimeout *= time.Second
+	return nil
+}
+
+// 初始化数据库连接
+func setupDBEngine() error {
+	var err error
+	global.DBEngine, err = model.NewDBEngine(global.DatabaseSetting)
+	if err != nil {
+		return err
+	}
 	return nil
 }
