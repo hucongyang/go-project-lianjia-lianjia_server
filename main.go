@@ -31,6 +31,10 @@ func init() {
 	}
 }
 
+// @title 链家二手房房价数据api接口服务系统
+// @version 1.0
+// @description
+// @termsOfService https://github.com/hucongyang/go-project-lianjia-lianjia_server
 func main() {
 	gin.SetMode(global.ServerSetting.RunMode)
 	router := routers.NewRouter()
