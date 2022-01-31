@@ -1,0 +1,165 @@
+definitions:
+  app.Pager:
+    properties:
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total_rows:
+        type: integer
+    type: object
+  errcode.Error:
+    properties:
+      code:
+        type: integer
+      details:
+        items:
+          type: string
+        type: array
+      msg:
+        type: string
+    type: object
+  model.District:
+    properties:
+      created_by:
+        type: string
+      created_on:
+        type: string
+      deleted_on:
+        type: integer
+      id:
+        type: integer
+      is_del:
+        type: integer
+      lianjia_district_id:
+        type: integer
+      modified_by:
+        type: string
+      modified_on:
+        type: string
+      name:
+        type: string
+      quanpin:
+        type: string
+      status:
+        type: string
+    type: object
+  model.DistrictSwagger:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/model.District'
+        type: array
+      pager:
+        $ref: '#/definitions/app.Pager'
+        type: object
+    type: object
+info:
+  contact: {}
+  license: {}
+  termsOfService: https://github.com/hucongyang/go-project-lianjia-lianjia_server
+  title: 链家二手房房价数据api接口服务系统
+  version: "1.0"
+paths:
+  /api/v1/districts:
+    get:
+      parameters:
+      - description: 商业圈名称
+        in: query
+        maxLength: 200
+        name: name
+        type: string
+      - description: 商业圈拼音
+        in: query
+        maxLength: 200
+        name: quanpin
+        type: string
+      - default: 1
+        description: 状态
+        enum:
+        - 0
+        - 1
+        in: query
+        name: status
+        type: integer
+      - description: 页码
+        in: query
+        name: page
+        type: integer
+      - description: 每页数量
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/model.DistrictSwagger'
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 获取多个商业圈
+    post:
+      parameters:
+      - description: 商业圈名称
+        in: body
+        maxLength: 200
+        minLength: 3
+        name: name
+        required: true
+        schema:
+          type: string
+      - description: 商业圈拼音
+        in: body
+        maxLength: 200
+        minLength: 3
+        name: quanpin
+        required: true
+        schema:
+          type: string
+      - description: 链家网站原始区域ID
+        in: body
+        name: lianjia_district_id
+        required: true
+        schema:
+          type: integer
+      - default: 1
+        description: 状态
+        enum:
+        - 0
+        - 1
+        in: body
+        name: status
+        schema:
+          type: integer
+      - description: 创建者
+        in: body
+        maxLength: 100
+        minLength: 3
+        name: created_by
+        schema:
+          type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 成功
+          schema:
+            $ref: '#/definitions/model.District'
+        "400":
+          description: 请求错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+        "500":
+          description: 内部错误
+          schema:
+            $ref: '#/definitions/errcode.Error'
+      summary: 新增商业圈
+swagger: "2.0"

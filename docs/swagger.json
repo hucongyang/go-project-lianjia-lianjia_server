@@ -1,0 +1,247 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "链家二手房房价数据api接口服务系统",
+        "termsOfService": "https://github.com/hucongyang/go-project-lianjia-lianjia_server",
+        "contact": {},
+        "license": {},
+        "version": "1.0"
+    },
+    "paths": {
+        "/api/v1/districts": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "获取多个商业圈",
+                "parameters": [
+                    {
+                        "maxLength": 200,
+                        "type": "string",
+                        "description": "商业圈名称",
+                        "name": "name",
+                        "in": "query"
+                    },
+                    {
+                        "maxLength": 200,
+                        "type": "string",
+                        "description": "商业圈拼音",
+                        "name": "quanpin",
+                        "in": "query"
+                    },
+                    {
+                        "enum": [
+                            0,
+                            1
+                        ],
+                        "type": "integer",
+                        "default": 1,
+                        "description": "状态",
+                        "name": "status",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页数量",
+                        "name": "page_size",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "$ref": "#/definitions/model.DistrictSwagger"
+                        }
+                    },
+                    "400": {
+                        "description": "请求错误",
+                        "schema": {
+                            "$ref": "#/definitions/errcode.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/errcode.Error"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "新增商业圈",
+                "parameters": [
+                    {
+                        "maxLength": 200,
+                        "minLength": 3,
+                        "description": "商业圈名称",
+                        "name": "name",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "maxLength": 200,
+                        "minLength": 3,
+                        "description": "商业圈拼音",
+                        "name": "quanpin",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "description": "链家网站原始区域ID",
+                        "name": "lianjia_district_id",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "enum": [
+                            0,
+                            1
+                        ],
+                        "default": 1,
+                        "description": "状态",
+                        "name": "status",
+                        "in": "body",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "maxLength": 100,
+                        "minLength": 3,
+                        "description": "创建者",
+                        "name": "created_by",
+                        "in": "body",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "成功",
+                        "schema": {
+                            "$ref": "#/definitions/model.District"
+                        }
+                    },
+                    "400": {
+                        "description": "请求错误",
+                        "schema": {
+                            "$ref": "#/definitions/errcode.Error"
+                        }
+                    },
+                    "500": {
+                        "description": "内部错误",
+                        "schema": {
+                            "$ref": "#/definitions/errcode.Error"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "app.Pager": {
+            "type": "object",
+            "properties": {
+                "page": {
+                    "type": "integer"
+                },
+                "page_size": {
+                    "type": "integer"
+                },
+                "total_rows": {
+                    "type": "integer"
+                }
+            }
+        },
+        "errcode.Error": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "details": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "msg": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.District": {
+            "type": "object",
+            "properties": {
+                "created_by": {
+                    "type": "string"
+                },
+                "created_on": {
+                    "type": "string"
+                },
+                "deleted_on": {
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_del": {
+                    "type": "integer"
+                },
+                "lianjia_district_id": {
+                    "type": "integer"
+                },
+                "modified_by": {
+                    "type": "string"
+                },
+                "modified_on": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "quanpin": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.DistrictSwagger": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.District"
+                    }
+                },
+                "pager": {
+                    "type": "object",
+                    "$ref": "#/definitions/app.Pager"
+                }
+            }
+        }
+    }
+}
