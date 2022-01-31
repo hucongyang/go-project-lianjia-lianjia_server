@@ -2,6 +2,7 @@ package v1
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/hucongyang/go-project-lianjia-lianjia_server/global"
 	"github.com/hucongyang/go-project-lianjia-lianjia_server/pkg/app"
 	"github.com/hucongyang/go-project-lianjia-lianjia_server/pkg/errcode"
 )
@@ -14,6 +15,7 @@ func NewXiaoqu() Xiaoqu {
 
 func (x Xiaoqu) Get(c *gin.Context) {}
 func (x Xiaoqu) List(c *gin.Context) {
+	global.Logger.Infof(c, "%s go-programming %s", "1", "2")
 	app.NewResponse(c).ToErrorResponse(errcode.ServerError)
 	return
 }
