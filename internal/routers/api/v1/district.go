@@ -1,6 +1,11 @@
 package v1
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/hucongyang/go-project-lianjia-lianjia_server/global"
+	"github.com/hucongyang/go-project-lianjia-lianjia_server/pkg/app"
+	"github.com/hucongyang/go-project-lianjia-lianjia_server/pkg/errcode"
+)
 
 type District struct{}
 
@@ -25,7 +30,18 @@ func (d District) Get(c *gin.Context) {
 // @Failure 500 {object} errcode.Error "内部错误"
 // @Router /api/v1/districts [get]
 func (d District) List(c *gin.Context) {
-
+	param := struct {
+		Name   string `form:"name" binding:"max=100"`
+		Status uint8  `form:"status,default=1" binding:"oneof=0 1"`
+	}{}
+	response := app.NewResponse(c)
+	valid, errs := app.BindAndValid(c, &param)
+	if valid == true {
+		global.Logger.Errorf(c, "app.BindAndValid errs: %v", errs)
+		response.ToErrorResponse(errcode.InvalidParams.WithDetails(errs.Errors()...))
+	}
+	response.ToResponse(gin.H{})
+	return
 }
 
 // Create
