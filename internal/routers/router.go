@@ -3,6 +3,7 @@ package routers
 import (
 	"github.com/gin-gonic/gin"
 	_ "github.com/hucongyang/go-project-lianjia-lianjia_server/docs"
+	"github.com/hucongyang/go-project-lianjia-lianjia_server/internal/middleware"
 	v1 "github.com/hucongyang/go-project-lianjia-lianjia_server/internal/routers/api/v1"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
@@ -12,6 +13,8 @@ func NewRouter() *gin.Engine {
 	r := gin.New()
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
+	// 注册中间件：国际化处理
+	r.Use(middleware.Translations())
 
 	district := v1.NewDistrict()
 	xiaoqu := v1.NewXiaoqu()
