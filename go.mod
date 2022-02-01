@@ -5,6 +5,7 @@ go 1.15
 require (
 	github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
+	github.com/eddycjy/opentracing-gorm v0.0.0-20200209122056-516a807d2182
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-playground/locales v0.14.0
 	github.com/go-playground/universal-translator v0.18.0
@@ -16,6 +17,7 @@ require (
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-isatty v0.0.14 // indirect
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
+	github.com/opentracing/opentracing-go v1.2.0 // indirect
 	github.com/spf13/afero v1.8.0 // indirect
 	github.com/spf13/viper v1.10.1
 	github.com/swaggo/gin-swagger v1.4.0

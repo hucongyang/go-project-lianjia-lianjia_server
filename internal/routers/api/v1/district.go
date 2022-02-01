@@ -3,7 +3,9 @@ package v1
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/hucongyang/go-project-lianjia-lianjia_server/global"
+	"github.com/hucongyang/go-project-lianjia-lianjia_server/internal/service"
 	"github.com/hucongyang/go-project-lianjia-lianjia_server/pkg/app"
+	"github.com/hucongyang/go-project-lianjia-lianjia_server/pkg/convert"
 	"github.com/hucongyang/go-project-lianjia-lianjia_server/pkg/errcode"
 )
 
@@ -12,6 +14,8 @@ type District struct{}
 func NewDistrict() District {
 	return District{}
 }
+
+// 数据操作流程：router路由 -> server服务 -> dao数据封装接口 -> model模型数据
 
 func (d District) Get(c *gin.Context) {
 
@@ -30,17 +34,31 @@ func (d District) Get(c *gin.Context) {
 // @Failure 500 {object} errcode.Error "内部错误"
 // @Router /api/v1/districts [get]
 func (d District) List(c *gin.Context) {
-	param := struct {
-		Name   string `form:"name" binding:"max=100"`
-		Status uint8  `form:"status,default=1" binding:"oneof=0 1"`
-	}{}
+	param := service.DistrictListRequest{}
 	response := app.NewResponse(c)
 	valid, errs := app.BindAndValid(c, &param)
-	if valid == true {
+	if !valid {
 		global.Logger.Errorf(c, "app.BindAndValid errs: %v", errs)
 		response.ToErrorResponse(errcode.InvalidParams.WithDetails(errs.Errors()...))
+		return
 	}
-	response.ToResponse(gin.H{})
+
+	svc := service.New(c.Request.Context())
+	pager := app.Pager{Page: app.GetPage(c), PageSize: app.GetPageSize(c)}
+	totalRows, err := svc.CountDistrict(&service.CountDistrictRequest{Name: param.Name, Status: param.Status})
+	if err != nil {
+		global.Logger.Errorf(c, "svc.CountDistrict err: %v", err)
+		response.ToErrorResponse(errcode.ErrorCountTagFail)
+		return
+	}
+	tags, err := svc.GetDistrictList(&param, &pager)
+	if err != nil {
+		global.Logger.Errorf(c, "svc.GetTagList err: %v", err)
+		response.ToErrorResponse(errcode.ErrorGetTagListFail)
+		return
+	}
+
+	response.ToResponseList(tags, totalRows)
 	return
 }
 
@@ -57,13 +75,69 @@ func (d District) List(c *gin.Context) {
 // @Failure 500 {object} errcode.Error "内部错误"
 // @Router /api/v1/districts [post]
 func (d District) Create(c *gin.Context) {
+	param := service.CreateDistrictRequest{}
+	response := app.NewResponse(c)
+	valid, errs := app.BindAndValid(c, &param)
+	if !valid {
+		global.Logger.Errorf(c, "app.BindAndValid errs: %v", errs)
+		response.ToErrorResponse(errcode.InvalidParams.WithDetails(errs.Errors()...))
+		return
+	}
 
+	svc := service.New(c.Request.Context())
+	err := svc.CreateDistrict(&param)
+	if err != nil {
+		global.Logger.Errorf(c, "svc.CreateDistrict err: %v", err)
+		response.ToErrorResponse(errcode.ErrorCreateTagFail)
+		return
+	}
+
+	response.ToResponse(gin.H{})
+	return
 }
 
 func (d District) Update(c *gin.Context) {
+	param := service.UpdateDistrictRequest{
+		ID: convert.StrTo(c.Param("id")).MustUInt32(),
+	}
+	response := app.NewResponse(c)
+	valid, errs := app.BindAndValid(c, &param)
+	if !valid {
+		global.Logger.Errorf(c, "app.BindAndValid errs: %v", errs)
+		response.ToErrorResponse(errcode.InvalidParams.WithDetails(errs.Errors()...))
+		return
+	}
 
+	svc := service.New(c.Request.Context())
+	err := svc.UpdateDistrict(&param)
+	if err != nil {
+		global.Logger.Errorf(c, "svc.UpdateDistrict err: %v", err)
+		response.ToErrorResponse(errcode.ErrorUpdateTagFail)
+		return
+	}
+
+	response.ToResponse(gin.H{})
+	return
 }
 
 func (d District) Delete(c *gin.Context) {
+	param := service.DeleteDistrictRequest{ID: convert.StrTo(c.Param("id")).MustUInt32()}
+	response := app.NewResponse(c)
+	valid, errs := app.BindAndValid(c, &param)
+	if !valid {
+		global.Logger.Errorf(c, "app.BindAndValid errs: %v", errs)
+		response.ToErrorResponse(errcode.InvalidParams.WithDetails(errs.Errors()...))
+		return
+	}
 
+	svc := service.New(c.Request.Context())
+	err := svc.DeleteDistrict(&param)
+	if err != nil {
+		global.Logger.Errorf(c, "svc.DeleteDistrict err: %v", err)
+		response.ToErrorResponse(errcode.ErrorDeleteTagFail)
+		return
+	}
+
+	response.ToResponse(gin.H{})
+	return
 }
