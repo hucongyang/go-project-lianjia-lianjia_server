@@ -1,7 +1,8 @@
 package main
 
 import (
-	"context"
+	"fmt"
+	"github.com/fvbock/endless"
 	"github.com/gin-gonic/gin"
 	"github.com/hucongyang/go-project-lianjia-lianjia_server/global"
 	"github.com/hucongyang/go-project-lianjia-lianjia_server/internal/model"
@@ -10,9 +11,6 @@ import (
 	setting2 "github.com/hucongyang/go-project-lianjia-lianjia_server/pkg/setting"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"log"
-	"net/http"
-	"os"
-	"os/signal"
 	"syscall"
 	"time"
 )
@@ -41,35 +39,55 @@ func init() {
 // @termsOfService https://github.com/hucongyang/go-project-lianjia-lianjia_server
 func main() {
 	gin.SetMode(global.ServerSetting.RunMode)
+
 	router := routers.NewRouter()
-	service := &http.Server{
-		Addr:           ":" + global.ServerSetting.HttpPort,
-		Handler:        router,
-		ReadTimeout:    global.ServerSetting.ReadTimeout,
-		WriteTimeout:   global.ServerSetting.WriteTimeout,
-		MaxHeaderBytes: 1 << 20,
+	readTimeout := global.ServerSetting.ReadTimeout
+	writeTimeout := global.ServerSetting.WriteTimeout
+	endPoint := fmt.Sprintf(":%d", global.ServerSetting.HttpPort)
+	maxHeaderBytes := 1 << 20
+	//server := &http.Server{
+	//	Addr:           endPoint,
+	//	Handler:        router,
+	//	ReadTimeout:    readTimeout,
+	//	WriteTimeout:   writeTimeout,
+	//	MaxHeaderBytes: maxHeaderBytes,
+	//}
+	//log.Printf("[info] start http server listening %s", endPoint)
+	//server.ListenAndServe()
+
+	// 2. 优雅的重启 使用 endless
+	endless.DefaultReadTimeOut = readTimeout
+	endless.DefaultWriteTimeOut = writeTimeout
+	endless.DefaultMaxHeaderBytes = maxHeaderBytes
+	server := endless.NewServer(endPoint, router)
+	server.BeforeBegin = func(add string) {
+		log.Printf("Actual pid is %d", syscall.Getpid())
+	}
+	err := server.ListenAndServe()
+	if err != nil {
+		log.Printf("Server error: %v", err)
 	}
 
-	// 优雅重启和停止：更新服务不停止现有服务
-	go func() {
-		if err := service.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("service.ListenAndServe error: %v", err)
-		}
-	}()
-	// 等待中断信号
-	quit := make(chan os.Signal)
-	// 接收 syscall.SIGINT 和 syscall.SIGTERM 信号
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	<-quit
-	log.Println("Shuting down server...")
-	// 最大时间控制，通知该服务端它有5s的时间来处理原有的请求
-	// 如果没有正在处理的旧请求，那么在按组合键ctrl+c后，其会直接退出（因为不需要等待）
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	if err := service.Shutdown(ctx); err != nil {
-		log.Fatal("Server forced to shutdown: ", err)
-	}
-	log.Println("Server exiting")
+	//// 1. 优雅的停止：更新服务不停止现有服务
+	//go func() {
+	//	if err := service.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+	//		log.Fatalf("service.ListenAndServe error: %v", err)
+	//	}
+	//}()
+	//// 等待中断信号
+	//quit := make(chan os.Signal)
+	//// 接收 syscall.SIGINT 和 syscall.SIGTERM 信号
+	//signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	//<-quit
+	//log.Println("Shuting down server...")
+	//// 最大时间控制，通知该服务端它有5s的时间来处理原有的请求
+	//// 如果没有正在处理的旧请求，那么在按组合键ctrl+c后，其会直接退出（因为不需要等待）
+	//ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	//defer cancel()
+	//if err := service.Shutdown(ctx); err != nil {
+	//	log.Fatal("Server forced to shutdown: ", err)
+	//}
+	//log.Println("Server exiting")
 }
 
 // 初始化配置
