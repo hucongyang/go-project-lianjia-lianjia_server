@@ -15,7 +15,7 @@ Database:
   DBType: mysql
   Username: root
   Password: root
-  Host: 0.0.0.0:3306
+  Host: 127.0.0.1:3306
   DBName: db_lianjia
   TablePrefix: lj_
   Charset: utf8
