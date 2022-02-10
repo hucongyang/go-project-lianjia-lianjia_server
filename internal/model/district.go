@@ -7,14 +7,13 @@ import (
 
 type District struct {
 	*Model
-	Name              string `json:"name"`
-	Quanpin           string `json:"quanpin"`
-	LianjiaDistrictId int    `json:"lianjia_district_id"`
-	Status            uint8  `json:"status"`
+	Name    string `json:"name"`
+	Quanpin string `json:"quanpin"`
+	CityId  int    `json:"city_id"`
 }
 
 func (d District) TableName() string {
-	return "lj_district"
+	return "lj_city_district"
 }
 
 type DistrictSwagger struct {
@@ -27,8 +26,6 @@ func (d District) Count(db *gorm.DB) (int, error) {
 	if d.Name != "" {
 		db = db.Where("name = ?", d.Name)
 	}
-	db = db.Where("status = ?", d.Status)
-	db = db.Where("is_del = ?", 0)
 	if err := db.Model(&d).Count(&count).Error; err != nil {
 		return 0, err
 	}
@@ -44,8 +41,6 @@ func (d District) List(db *gorm.DB, pageOffset, pageSize int) ([]*District, erro
 	if d.Name != "" {
 		db = db.Where("name = ?", d.Name)
 	}
-	db = db.Where("status = ?", d.Status)
-	db = db.Where("is_del = ?", 0)
 	if err = db.Find(&districts).Error; err != nil {
 		return nil, err
 	}
@@ -54,7 +49,7 @@ func (d District) List(db *gorm.DB, pageOffset, pageSize int) ([]*District, erro
 
 func (d District) Get(db *gorm.DB) (District, error) {
 	var district District
-	err := db.Where("id = ? AND is_del = ? AND state = ?", d.ID, 0, d.Status).First(&district).Error
+	err := db.Where("id = ?", d.ID).First(&district).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return d, err
 	}
@@ -64,7 +59,7 @@ func (d District) Get(db *gorm.DB) (District, error) {
 
 func (d District) ListByIDs(db *gorm.DB, ids []uint32) ([]*District, error) {
 	var districts []*District
-	db = db.Where("state = ? AND is_del = ?", d.Status, 0)
+	db = db.Where("is_del = ?", 0)
 	err := db.Where("id IN (?)", ids).Find(districts).Error
 	if err != nil && err != gorm.ErrRecordNotFound {
 		return nil, err
