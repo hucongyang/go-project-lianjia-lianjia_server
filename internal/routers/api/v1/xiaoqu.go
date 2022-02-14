@@ -65,6 +65,28 @@ func (x Xiaoqu) Update(c *gin.Context) {}
 
 func (x Xiaoqu) Delete(c *gin.Context) {}
 
+func (x Xiaoqu) Search(c *gin.Context) {
+	param := service.SearchXiaoquRequest{}
+	response := app.NewResponse(c)
+	valid, errs := app.BindAndValid(c, &param)
+	if !valid {
+		global.Logger.Errorf(c, "app.BindAndValid errs: %v", errs)
+		response.ToErrorResponse(errcode.InvalidParams.WithDetails(errs.Errors()...))
+		return
+	}
+
+	svc := service.New(c.Request.Context())
+	xiaoqus, err := svc.SearchXiaoquList(&param)
+	if err != nil {
+		global.Logger.Errorf(c, "svc.SearchXiaoqu err: %v", err)
+		response.ToErrorResponse(errcode.ErrorCreateTagFail)
+		return
+	}
+
+	response.ToResponseList(xiaoqus, 10)
+	return
+}
+
 func (x Xiaoqu) GetHistory(c *gin.Context) {
 	param := service.XiaoquGetHistoryRequest{}
 	param.XiaoquId = c.Param("xiaoquId")

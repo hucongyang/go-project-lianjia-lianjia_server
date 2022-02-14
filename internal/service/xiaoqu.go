@@ -27,6 +27,14 @@ type XiaoquGetHistoryRequest struct {
 	XiaoquId string `form:"xiaoqu_id" `
 }
 
+type SearchXiaoquRequest struct {
+	Keyword string `form:"Keyword"`
+}
+
+func (svc *Service) SearchXiaoquList(param *SearchXiaoquRequest) ([]*model.Xiaoqu, error) {
+	return svc.dao.SearchXiaoquList(param.Keyword)
+}
+
 func (svc *Service) GetXiaoquDetail(param *XiaoquGetDetailRequest) (model.Xiaoqu, error) {
 	return svc.dao.GetXiaoquDetail(param.XiaoquId)
 }

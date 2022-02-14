@@ -16,8 +16,15 @@ func NewRouter() *gin.Engine {
 	// 注册中间件：国际化处理
 	r.Use(middleware.Translations())
 
+	// 区域
 	district := v1.NewDistrict()
+	// 小区
 	xiaoqu := v1.NewXiaoqu()
+	// 小区房子
+	fangzi := v1.NewSell()
+	// 成交房子
+	chengjiao := v1.NewChengjiao()
+
 	// 添加 swagger 文档路由
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	apiV1 := r.Group("/api/v1")
@@ -28,6 +35,7 @@ func NewRouter() *gin.Engine {
 		apiV1.PATCH("/districts/:id/status", district.Update)
 		apiV1.GET("/districts", district.List)
 
+		apiV1.POST("/search/xiaoqus", xiaoqu.Search)
 		apiV1.POST("/xiaoqus", xiaoqu.Create)
 		apiV1.DELETE("/xiaoqus/:id", xiaoqu.Delete)
 		apiV1.PUT("/xiaoqus/:id", xiaoqu.Update)
@@ -35,6 +43,13 @@ func NewRouter() *gin.Engine {
 		apiV1.GET("/xiaoqus", xiaoqu.List)
 		apiV1.GET("/xiaoqus/:xiaoquId", xiaoqu.Get)
 		apiV1.GET("/xiaoqus/:xiaoquId/history", xiaoqu.GetHistory)
+
+		apiV1.GET("/fangzis", fangzi.List)
+		apiV1.GET("/fangzis/detail/:fangziId", fangzi.Get)
+
+		apiV1.GET("/chengjiaos", chengjiao.List)
+		apiV1.GET("/chengjiaos/detail/:fangziId", chengjiao.Get)
+
 	}
 
 	return r

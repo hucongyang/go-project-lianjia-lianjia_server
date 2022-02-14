@@ -31,6 +31,18 @@ type XiaoquSwagger struct {
 	Pager *app.Pager
 }
 
+func (xiaoqu Xiaoqu) Search(db *gorm.DB) ([]*Xiaoqu, error) {
+	var xiaoqus []*Xiaoqu
+	var err error
+	if xiaoqu.Title != "" {
+		db = db.Where("title like ?", xiaoqu.Title+"%")
+	}
+	if err = db.Find(&xiaoqus).Error; err != nil {
+		return nil, err
+	}
+	return xiaoqus, nil
+}
+
 func (xiaoqu Xiaoqu) Count(db *gorm.DB) (int, error) {
 	var count int
 	if xiaoqu.DistrictId > 0 {

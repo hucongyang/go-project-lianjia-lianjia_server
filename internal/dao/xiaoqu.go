@@ -7,6 +7,11 @@ import (
 
 // 数据访问对象的封装
 
+func (d *Dao) SearchXiaoquList(keyword string) ([]*model.Xiaoqu, error) {
+	xiaoqu := model.Xiaoqu{Title: keyword}
+	return xiaoqu.Search(d.engine)
+}
+
 func (d *Dao) CountXiaoqu(districtId uint32) (int, error) {
 	xiaoqu := model.Xiaoqu{
 		DistrictId: districtId,
