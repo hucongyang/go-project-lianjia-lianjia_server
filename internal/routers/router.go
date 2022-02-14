@@ -33,6 +33,8 @@ func NewRouter() *gin.Engine {
 		apiV1.PUT("/xiaoqus/:id", xiaoqu.Update)
 		apiV1.PATCH("/xiaoqus/:id/status", xiaoqu.Update)
 		apiV1.GET("/xiaoqus", xiaoqu.List)
+		apiV1.GET("/xiaoqus/:xiaoquId", xiaoqu.Get)
+		apiV1.GET("/xiaoqus/:xiaoquId/history", xiaoqu.GetHistory)
 	}
 
 	return r

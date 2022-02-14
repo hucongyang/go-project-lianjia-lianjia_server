@@ -15,8 +15,20 @@ type CountXiaoquRequest struct {
 	DistrictId uint32 `form:"district_id" `
 }
 
+type XiaoquGetDetailRequest struct {
+	XiaoquId string `form:"xiaoqu_id" `
+}
+
 type XiaoquListRequest struct {
 	DistrictId uint32 `form:"district_id" `
+}
+
+type XiaoquGetHistoryRequest struct {
+	XiaoquId string `form:"xiaoqu_id" `
+}
+
+func (svc *Service) GetXiaoquDetail(param *XiaoquGetDetailRequest) (model.Xiaoqu, error) {
+	return svc.dao.GetXiaoquDetail(param.XiaoquId)
 }
 
 func (svc *Service) CountXiaoqu(param *CountXiaoquRequest) (int, error) {
@@ -25,4 +37,8 @@ func (svc *Service) CountXiaoqu(param *CountXiaoquRequest) (int, error) {
 
 func (svc *Service) GetXiaoquList(param *XiaoquListRequest, pager *app.Pager) ([]*model.Xiaoqu, error) {
 	return svc.dao.GetXiaoquList(param.DistrictId, pager.Page, pager.PageSize)
+}
+
+func (svc *Service) GetXiaoquHistoryList(param *XiaoquGetHistoryRequest, pager *app.Pager) ([]*model.XiaoquLog, error) {
+	return svc.dao.GetXiaoquHistoryList(param.XiaoquId, pager.Page, pager.PageSize)
 }

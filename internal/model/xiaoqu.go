@@ -7,18 +7,19 @@ import (
 
 type Xiaoqu struct {
 	*Model
-	XiaoquId       string `json:"xiaoqu_id"`
+	XiaoquId       string `json:"xiaoquId"`
 	Url            string `json:"url"`
-	BuildDate      string `json:"build_date"`
+	BuildDate      string `json:"buildDate"`
 	ChengJiaoText  string `json:"cheng_jiao_text"`
 	ChengJiaoUrl   string `json:"cheng_jiao_url"`
 	DistrictId     uint32 `json:"district_id"`
+	DistrictTitle  string `json:"district_title"`
 	Img            string `json:"img"`
 	HouseSellUrl   string `json:"sell_url"`
-	TagList        string `json:"tag_list"`
+	TagList        string `json:"tagList"`
 	Title          string `json:"title"`
-	TotalPrice     string `json:"total_price"`
-	TotalSellCount string `json:"total_sell_count"`
+	TotalPrice     string `json:"totalPrice"`
+	TotalSellCount string `json:"totalSellCount"`
 }
 
 func (xiaoqu Xiaoqu) TableName() string {
@@ -54,4 +55,29 @@ func (xiaoqu Xiaoqu) List(db *gorm.DB, pageOffset, pageSize int) ([]*Xiaoqu, err
 		return nil, err
 	}
 	return xiaoqus, nil
+}
+
+func (xiaoqu Xiaoqu) Detail(db *gorm.DB) (Xiaoqu, error) {
+	var detail Xiaoqu
+	err := db.Where("xiaoqu_id = ?", xiaoqu.XiaoquId).First(&detail).Error
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return detail, err
+	}
+
+	return detail, nil
+}
+
+func (xiaoqu Xiaoqu) GetHistory(db *gorm.DB, pageOffset, pageSize int) ([]*XiaoquLog, error) {
+	var xiaoqulogs []*XiaoquLog
+	var err error
+	if pageOffset >= 0 && pageSize > 0 {
+		db = db.Offset(pageOffset).Limit(pageSize)
+	}
+	if xiaoqu.XiaoquId != "" {
+		db = db.Where("xiaoqu_id = ?", xiaoqu.XiaoquId)
+	}
+	if err = db.Order("fetch_time desc").Find(&xiaoqulogs).Error; err != nil {
+		return nil, err
+	}
+	return xiaoqulogs, nil
 }

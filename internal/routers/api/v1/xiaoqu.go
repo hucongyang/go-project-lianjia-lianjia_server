@@ -14,7 +14,21 @@ func NewXiaoqu() Xiaoqu {
 	return Xiaoqu{}
 }
 
-func (x Xiaoqu) Get(c *gin.Context) {}
+func (x Xiaoqu) Get(c *gin.Context) {
+	param := service.XiaoquGetDetailRequest{}
+	param.XiaoquId = c.Param("xiaoquId")
+	response := app.NewResponse(c)
+	svc := service.New(c.Request.Context())
+	xiaoqu, err := svc.GetXiaoquDetail(&param)
+	if err != nil {
+		global.Logger.Errorf(c, "svc.GetXiaoquDetail err: %v", err)
+		response.ToErrorResponse(errcode.ErrorGetTagListFail)
+		return
+	}
+
+	response.ToResponse(xiaoqu)
+	return
+}
 
 func (x Xiaoqu) List(c *gin.Context) {
 	param := service.XiaoquListRequest{}
@@ -50,3 +64,20 @@ func (x Xiaoqu) Create(c *gin.Context) {}
 func (x Xiaoqu) Update(c *gin.Context) {}
 
 func (x Xiaoqu) Delete(c *gin.Context) {}
+
+func (x Xiaoqu) GetHistory(c *gin.Context) {
+	param := service.XiaoquGetHistoryRequest{}
+	param.XiaoquId = c.Param("xiaoquId")
+	response := app.NewResponse(c)
+	svc := service.New(c.Request.Context())
+	pager := app.Pager{Page: 1, PageSize: 6}
+	xiaoqulogs, err := svc.GetXiaoquHistoryList(&param, &pager)
+	if err != nil {
+		global.Logger.Errorf(c, "svc.GetXiaoquHistoryList err: %v", err)
+		response.ToErrorResponse(errcode.ErrorGetTagListFail)
+		return
+	}
+	// 数据做处理
+	response.ToResponse(xiaoqulogs)
+	return
+}

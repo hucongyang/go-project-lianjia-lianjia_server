@@ -19,3 +19,14 @@ func (d *Dao) GetXiaoquList(districtId uint32, page, pageSize int) ([]*model.Xia
 	pageOffset := app.GetPageOffset(page, pageSize)
 	return xiaoqu.List(d.engine, pageOffset, pageSize)
 }
+
+func (d *Dao) GetXiaoquDetail(xiaoquId string) (model.Xiaoqu, error) {
+	xiaoqu := model.Xiaoqu{XiaoquId: xiaoquId}
+	return xiaoqu.Detail(d.engine)
+}
+
+func (d *Dao) GetXiaoquHistoryList(xiaoquId string, page, pageSize int) ([]*model.XiaoquLog, error) {
+	xiaoqulog := model.XiaoquLog{XiaoquId: xiaoquId}
+	pageOffset := app.GetPageOffset(page, pageSize)
+	return xiaoqulog.List(d.engine, pageOffset, pageSize)
+}
