@@ -100,6 +100,18 @@ func (x Xiaoqu) GetHistory(c *gin.Context) {
 		return
 	}
 	// 数据做处理
-	response.ToResponse(xiaoqulogs)
+	// echarts option
+	var xAxis, series []string
+	for _, xiaoqu := range xiaoqulogs {
+		xAxis = append(xAxis, xiaoqu.FetchTime)
+		series = append(series, xiaoqu.TotalPrice)
+	}
+
+	response.ToResponseEchartsList(xiaoqulogs,
+		gin.H{
+			"xAxis":  xAxis,
+			"series": series,
+		},
+		6)
 	return
 }

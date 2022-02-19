@@ -27,7 +27,7 @@ func (xiaoqulog XiaoquLog) List(db *gorm.DB, pageOffset, pageSize int) ([]*Xiaoq
 	if xiaoqulog.XiaoquId != "" {
 		db = db.Where("xiaoqu_id = ?", xiaoqulog.XiaoquId)
 	}
-	if err = db.Order("fetch_time desc").Find(&xiaoqulogs).Error; err != nil {
+	if err = db.Order("fetch_time asc").Find(&xiaoqulogs).Error; err != nil {
 		return nil, err
 	}
 	return xiaoqulogs, nil
